@@ -58,3 +58,12 @@ test("a user cannot delete or see someone else's file", async () => {
   assert.equal((await (await fetch(base + '/api/files', { headers: { cookie: b } })).json()).length, 0);
   assert.equal((await fetch(base + '/api/files/' + id, { method: 'DELETE', headers: { cookie: a } })).status, 200);
 });
+
+test('a valid cookie for a user that no longer exists is rejected, not crashed on', async () => {
+  const c = await login('gone@test.com');
+  const db = require('../db');
+  db.prepare('DELETE FROM users WHERE email = ?').run('gone@test.com'); // simulates a wiped database
+  assert.equal((await fetch(base + '/api/me', { headers: { cookie: c } })).status, 401);
+  assert.equal((await upload(c, 'pic.png', PNG)).status, 401);
+  assert.equal((await fetch(base + '/api/health')).status, 200); // server still up
+});
