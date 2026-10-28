@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FileShare</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header><h1>FileShare</h1><div id="userbar" hidden><span id="who"></span> <button id="logout" class="ghost">Log out</button></div></header>
+  <main>
+    <p id="msg" role="status"></p>
+
+    <section id="auth" hidden>
+      <h2 id="auth-title">Log in</h2>
+      <form id="auth-form">
+        <label>Email <input type="email" id="email" required autocomplete="username"></label>
+        <label>Password <input type="password" id="password" required minlength="8" autocomplete="current-password"></label>
+        <button type="submit" id="auth-submit">Log in</button>
+      </form>
+      <p><a href="#" id="toggle">Need an account? Register</a></p>
+    </section>
+
+    <section id="dash" hidden>
+      <div class="card">
+        <h2>Upload a file</h2>
+        <form id="upload-form">
+          <input type="file" id="file" required>
+          <button type="submit">Upload</button>
+        </form>
+        <p class="hint">Max 10 MB per file. Types: pdf, png, jpg, txt, zip, docx.</p>
+        <div class="bar"><div id="bar-fill"></div></div>
+        <p id="quota-text" class="hint"></p>
+      </div>
+      <h2>Your files</h2>
+      <div id="files"></div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
