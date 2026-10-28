@@ -109,6 +109,24 @@ Everything lives under `DATA_DIR`: the SQLite database and the uploaded bytes. R
 
 After deploying, check `https://<your-app>/api/health` returns `{"ok":true}`.
 
+## Run on a laptop with a public link (data persists)
+
+Free hosts like Render's free plan wipe the disk on every redeploy. Running on one machine keeps accounts and files in its `data/` folder, so they survive restarts. A Cloudflare quick tunnel gives it a public https link, with no account needed.
+
+1. Create a `.env` file in the project folder (it is git-ignored). Keep the same `JWT_SECRET` every time, so logins also survive restarts:
+```
+JWT_SECRET=paste-a-long-random-string-here
+NODE_ENV=production
+PORT=3000
+```
+   Generate the secret with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+2. Install the tunnel tool once (Windows): `winget install Cloudflare.cloudflared`
+3. Start the app: `npm run start:prod`
+4. In a second terminal start the tunnel: `cloudflared tunnel --url http://localhost:3000`
+5. It prints a link like `https://something-random.trycloudflare.com`. Share that link. It changes each time the tunnel restarts, and links created earlier keep working only for the same address, so create share links after the tunnel is up.
+
+The site is online only while this machine is on and both terminals are running. Back up the `data/` folder to keep a copy.
+
 ## Demo script (5 minutes)
 1. Register `owner@test.com` and upload a PDF. The storage bar moves.
 2. Try uploading a `.exe` renamed to `.png`: "File contents do not match its type".
