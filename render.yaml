@@ -1,0 +1,17 @@
+# Render Blueprint: New > Blueprint > pick this repo.
+# A persistent disk is required, otherwise uploads and the database are lost on every deploy.
+services:
+  - type: web
+    name: fileshare
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: fileshare-data
+      mountPath: /data
+      sizeGB: 1

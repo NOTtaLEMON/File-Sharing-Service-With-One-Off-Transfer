@@ -100,11 +100,12 @@ GET    /s/:token/download            (file as attachment)
 ## 11. Status
 | Area | Status |
 |---|---|
-| Accounts, upload, quota, validation, delete, dashboard, recipient page UI | Implemented; 4 automated tests pass (login required, type/size checks, quota, ownership) |
-| Share links, revoke, public download, download counter | Pending (part B). Stubs exist in `routes/links.js` and `routes/public.js` |
-| Expired-link file cleanup | Pending (part B, optional) |
-| Deployment, README, diagram | Pending (part D) |
-| End-to-end test of the full flow | Pending, after B lands |
+| Accounts, upload, quota, validation, delete, dashboard, recipient page UI | Implemented and tested |
+| Share links, revoke, public download, download counter | Implemented and tested (`routes/links.js`, `routes/public.js`, `lib/tokens.js`) |
+| Cleanup | Orphaned uploads and links expired/revoked over 7 days ago are removed hourly; files stay until the owner deletes them |
+| Deployment config, README, architecture diagram, demo script | Done (`Dockerfile`, `render.yaml`, `README.md`); not yet deployed to a host |
+| Automated tests | 10 `node:test` tests pass |
+| End-to-end flow | Checked in a browser: upload, share, download, count, revoke, restart persistence |
 
 ## 12. Success criteria (maps to the 10 evaluation questions)
 1. Roles and out-of-scope list: sections 2 and 9.
@@ -112,7 +113,7 @@ GET    /s/:token/download            (file as attachment)
 3. Architecture and flow with reasons: section 5.
 4. Persistence across restart: section 6 (SQLite file and uploads on a persistent volume).
 5. Unguessable links and access enforcement: sections 5 and 7.
-6. End-to-end flow works: upload, share, download, revoke (pending B).
+6. End-to-end flow works: upload, share, download, revoke (section 11).
 7. Malicious file cannot hurt service or users: section 7.
 8. Limits enforced by the server: section 3.
 9. No access to what isn't yours: section 7.

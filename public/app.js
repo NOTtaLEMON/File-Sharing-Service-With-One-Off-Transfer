@@ -23,7 +23,7 @@ async function api(method, url, body) {
   return data;
 }
 
-const fmtSize = (b) => (b < 1024 * 1024 ? (b / 1024).toFixed(1) + ' KB' : (b / 1024 / 1024).toFixed(2) + ' MB');
+const fmtSize = (b) => (b < 1024 ? b + ' B' : b < 1024 * 1024 ? (b / 1024).toFixed(1) + ' KB' : (b / 1024 / 1024).toFixed(2) + ' MB');
 const fmtDate = (iso) => new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 const iconFor = (name) => (name.split('.').pop() || 'file').slice(0, 4).toUpperCase();
 
@@ -107,8 +107,8 @@ function renderFiles(files) {
         r.append(
           el('span', '#' + l.id, 'hint'),
           el('span', l.status, 'badge st-' + l.status),
-          el('span', (l.status === 'active' ? 'expires ' : 'expired ') + fmtDate(l.expires_at), 'hint'),
-          el('span', `${l.download_count} downloads`)
+          el('span', ({ active: 'expires ', expired: 'expired ', revoked: 'was due ' })[l.status] + fmtDate(l.expires_at), 'hint when'),
+          el('span', `${l.download_count} download${l.download_count === 1 ? '' : 's'}`)
         );
         const slot = el('span');
         if (l.status === 'active') {

@@ -25,7 +25,7 @@ function show(mark, title, text, node) {
       a.href = '/s/' + encodeURIComponent(token) + '/download';
       a.className = 'btn';
       a.textContent = 'Download';
-      const size = data.size < 1024 * 1024 ? (data.size / 1024).toFixed(1) + ' KB' : (data.size / 1024 / 1024).toFixed(2) + ' MB';
+      const size = data.size < 1024 ? data.size + ' B' : data.size < 1024 * 1024 ? (data.size / 1024).toFixed(1) + ' KB' : (data.size / 1024 / 1024).toFixed(2) + ' MB';
       const ext = (data.name.split('.').pop() || 'file').slice(0, 3).toUpperCase();
       show(ext, data.name, size + ' · shared with you', a);
     } else {

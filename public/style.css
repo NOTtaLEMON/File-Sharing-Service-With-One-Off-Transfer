@@ -143,7 +143,9 @@ label { display: block; margin-bottom: 14px; font-size: 14px; font-weight: 700; 
 .newlink:empty { display: none; }
 code { font-weight: 700; color: var(--dp-color-accent); }
 .links { margin-top: 14px; border: var(--dp-border-detail-width) solid var(--dp-color-outline); border-radius: 14px; overflow: hidden; }
-.lk { display: grid; grid-template-columns: 36px 84px 1fr auto auto; gap: 8px; align-items: center; padding: 8px 12px; font-size: 13px; background: var(--dp-color-panel); }
+.lk { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 8px 12px; font-size: 13px; background: var(--dp-color-panel); }
+.lk .when { flex: 1 1 140px; }
+.lk > :last-child { margin-left: auto; }
 .lk + .lk { border-top: var(--dp-border-detail-width) solid var(--dp-color-rule-muted); }
 .badge { padding: 1px 10px; border: var(--dp-border-detail-width) solid var(--dp-color-outline); border-radius: 999px; font-size: 12px; font-weight: 700; text-align: center; }
 .st-active { background: var(--dp-color-accent-fresh); }
@@ -160,7 +162,7 @@ code { font-weight: 700; color: var(--dp-color-accent); }
 
 /* ---------- download page ---------- */
 .dl { max-width: 460px; margin: 40px auto 20px; text-align: center; padding: 34px 24px 28px; }
-.dl .big { width: 84px; height: 84px; margin: 0 auto 14px; display: grid; place-items: center; font-size: 40px; background: var(--dp-color-accent-warm); border: var(--dp-border-outline-width) solid var(--dp-color-outline); border-radius: 50% 50% 50% 10px; box-shadow: 4px 4px 0 var(--dp-color-outline); }
+.dl .big { width: 84px; height: 84px; margin: 0 auto 14px; display: grid; place-items: center; font-size: 24px; font-weight: 800; font-family: var(--dp-typography-display); background: var(--dp-color-accent-warm); border: var(--dp-border-outline-width) solid var(--dp-color-outline); border-radius: 50% 50% 50% 10px; box-shadow: 4px 4px 0 var(--dp-color-outline); }
 .dl h2 { font-size: 30px; word-break: break-all; }
 .dl p { margin: 8px 0 0; }
 .dl .btn { margin-top: 20px; padding: 12px 30px; font-size: 17px; }
@@ -177,7 +179,6 @@ footer b { font-family: var(--dp-typography-display); color: var(--dp-color-acce
   .steps::before { display: none; }
   .book { box-shadow: 5px 5px 0 var(--dp-color-accent); padding: 26px 16px 18px; }
   .stats { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
-  .lk { grid-template-columns: 1fr 1fr; }
   footer { border-radius: 50px 50px 18px 18px / 28px 28px 18px 18px; margin: 20px 14px; }
 }
 @media (max-width: 420px) { button, .btn { font-size: 14px; padding: 7px 14px; } .stat b { font-size: 28px; } }
