@@ -36,6 +36,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong' });
 });
 
+// Last-resort safety net: log stray errors instead of letting one bad request take the whole service down.
+process.on('uncaughtException', (err) => console.error('uncaughtException:', err));
+process.on('unhandledRejection', (err) => console.error('unhandledRejection:', err));
+
 if (require.main === module) {
   const { sweep } = require('./lib/cleanup');
   sweep();

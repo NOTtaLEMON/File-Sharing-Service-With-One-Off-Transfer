@@ -52,29 +52,37 @@ router.post('/', uploadLimiter, (req, res) => {
       }
       return res.status(err.status || 400).json({ error: err.message || 'Upload failed' });
     }
-    if (!req.file) return res.status(400).json({ error: 'No file received' });
+    // anything thrown here would be an uncaught exception (we are outside Express's error handling),
+    // so catch it: one bad upload must fail only that request, never kill the server
+    try {
+      if (!req.file) return res.status(400).json({ error: 'No file received' });
 
-    const ext = extOf(req.file.originalname);
-    const mime = sniff(req.file.path, ext);
-    if (!mime) {
-      removeQuietly(req.file.path);
-      return res.status(415).json({ error: 'File contents do not match its type' });
-    }
+      const ext = extOf(req.file.originalname);
+      const mime = sniff(req.file.path, ext);
+      if (!mime) {
+        removeQuietly(req.file.path);
+        return res.status(415).json({ error: 'File contents do not match its type' });
+      }
 
-    // quota check + insert in one transaction so two uploads can't both slip past
-    const tx = db.transaction(() => {
-      if (usedBytes(req.user.id) + req.file.size > QUOTA_BYTES) return null;
-      const info = db
-        .prepare('INSERT INTO files (owner_id, original_name, stored_name, mime, size) VALUES (?, ?, ?, ?, ?)')
-        .run(req.user.id, cleanName(req.file.originalname), req.file.filename, mime, req.file.size);
-      return info.lastInsertRowid;
-    });
-    const id = tx();
-    if (id === null) {
-      removeQuietly(req.file.path);
-      return res.status(413).json({ error: 'This upload would exceed your storage quota' });
+      // quota check + insert in one transaction so two uploads can't both slip past
+      const tx = db.transaction(() => {
+        if (usedBytes(req.user.id) + req.file.size > QUOTA_BYTES) return null;
+        const info = db
+          .prepare('INSERT INTO files (owner_id, original_name, stored_name, mime, size) VALUES (?, ?, ?, ?, ?)')
+          .run(req.user.id, cleanName(req.file.originalname), req.file.filename, mime, req.file.size);
+        return info.lastInsertRowid;
+      });
+      const id = tx();
+      if (id === null) {
+        removeQuietly(req.file.path);
+        return res.status(413).json({ error: 'This upload would exceed your storage quota' });
+      }
+      res.status(201).json({ id, name: cleanName(req.file.originalname), size: req.file.size });
+    } catch (e) {
+      console.error('upload failed:', e);
+      if (req.file) removeQuietly(req.file.path);
+      if (!res.headersSent) res.status(500).json({ error: 'Upload failed on the server. Please try again.' });
     }
-    res.status(201).json({ id, name: cleanName(req.file.originalname), size: req.file.size });
   });
 });
 
