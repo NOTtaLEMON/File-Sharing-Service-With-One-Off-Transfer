@@ -36,6 +36,9 @@ app.use((err, req, res, next) => {
 });
 
 if (require.main === module) {
+  const { sweepOrphans } = require('./lib/cleanup');
+  sweepOrphans();
+  setInterval(sweepOrphans, 60 * 60 * 1000).unref();
   app.listen(PORT, () => console.log(`Listening on http://localhost:${PORT}`));
 }
 module.exports = app;

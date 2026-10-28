@@ -74,7 +74,7 @@ function renderFiles(files) {
         copy.onclick = () => navigator.clipboard.writeText(url).then(() => say('Link copied'));
         link.append(' ', copy);
         refresh();
-      } catch (e) { say(e.message, true); }
+      } catch (e) { say(e.message === 'Not implemented yet' ? 'Share links are not ready on the server yet' : e.message, true); }
     };
     const del = el('button', 'Delete file', 'danger');
     del.onclick = async () => {
@@ -135,19 +135,52 @@ $('auth-form').onsubmit = async (e) => {
 
 $('logout').onclick = async () => { await api('POST', '/api/auth/logout'); say(''); showAuth(); };
 
+const MAX_BYTES = 10 * 1024 * 1024;
+const ALLOWED = ['pdf', 'png', 'jpg', 'jpeg', 'txt', 'zip', 'docx'];
+
+// XHR instead of fetch because fetch can't report upload progress
+function uploadWithProgress(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/files');
+    xhr.upload.onprogress = (ev) => { if (ev.lengthComputable) onProgress(ev.loaded / ev.total); };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText); } catch { /* not json */ }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data);
+      if (xhr.status === 401) showAuth();
+      reject(new Error(data.error || 'Upload failed (' + xhr.status + ')'));
+    };
+    xhr.onerror = () => reject(new Error('Network error during upload'));
+    xhr.send(fd);
+  });
+}
+
 $('upload-form').onsubmit = async (e) => {
   e.preventDefault();
   const file = $('file').files[0];
   if (!file) return;
-  const fd = new FormData();
-  fd.append('file', file);
+  // quick checks for a fast error; the server enforces the same rules again
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!ALLOWED.includes(ext)) return say('File type not allowed. Allowed: ' + ALLOWED.join(', '), true);
+  if (file.size > MAX_BYTES) return say('File too large (max 10 MB)', true);
+  if (file.size === 0) return say('That file is empty', true);
+
+  const btn = $('upload-btn');
+  const prog = $('upload-progress');
+  btn.disabled = true;
+  prog.hidden = false;
+  prog.value = 0;
   try {
     say('Uploading...');
-    await api('POST', '/api/files', fd);
+    await uploadWithProgress(file, (f) => { prog.value = f; });
     say('Uploaded ' + file.name);
     $('file').value = '';
     refresh();
   } catch (err) { say(err.message, true); }
+  finally { btn.disabled = false; prog.hidden = true; }
 };
 
 refresh().then(() => { if ($('dash').hidden) showAuth(); });

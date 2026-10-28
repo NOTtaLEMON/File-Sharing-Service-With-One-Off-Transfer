@@ -26,8 +26,9 @@
         <h2>Upload a file</h2>
         <form id="upload-form">
           <input type="file" id="file" required>
-          <button type="submit">Upload</button>
+          <button type="submit" id="upload-btn">Upload</button>
         </form>
+        <progress id="upload-progress" max="1" value="0" hidden></progress>
         <p class="hint">Max 10 MB per file. Types: pdf, png, jpg, txt, zip, docx.</p>
         <div class="bar"><div id="bar-fill"></div></div>
         <p id="quota-text" class="hint"></p>

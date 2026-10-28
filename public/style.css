@@ -14,6 +14,7 @@ select { padding: 7px; }
 .hint { color: #6b7280; font-size: 13px; }
 .bar { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
 #bar-fill { height: 100%; width: 0; background: #2563eb; }
+#upload-progress { width: 100%; margin-top: 8px; }
 #msg { min-height: 1.4em; }
 .error { color: #b91c1c; }
 .ok { color: #047857; }
