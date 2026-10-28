@@ -2,16 +2,18 @@ const box = document.getElementById('box');
 const token = location.pathname.split('/')[2] || '';
 
 const MESSAGES = {
-  expired: ['This link has expired', 'Ask the sender to share the file again.'],
-  revoked: ['This link was revoked', 'The sender has turned this link off.'],
-  not_found: ['Link not found', 'Check that you copied the whole link.'],
+  expired: ['⌛', 'This link has expired', 'Ask the sender to share the file again.'],
+  revoked: ['🚫', 'This link was revoked', 'The sender has turned this link off.'],
+  not_found: ['🔍', 'Link not found', 'Check that you copied the whole link.'],
 };
+const ICONS = { pdf: '📕', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', txt: '📝', zip: '🗜️', docx: '📘' };
 
-function show(title, text, node) {
+function show(icon, title, text, node) {
   box.replaceChildren();
+  const i = document.createElement('div'); i.className = 'big'; i.textContent = icon;
   const h = document.createElement('h2'); h.textContent = title;
-  const p = document.createElement('p'); p.textContent = text;
-  box.append(h, p);
+  const p = document.createElement('p'); p.className = 'hint'; p.textContent = text;
+  box.append(i, h, p);
   if (node) box.append(node);
 }
 
@@ -23,14 +25,14 @@ function show(title, text, node) {
       const a = document.createElement('a');
       a.href = '/s/' + encodeURIComponent(token) + '/download';
       a.className = 'btn';
-      a.textContent = 'Download';
+      a.textContent = '⬇ Download';
       const size = data.size < 1024 * 1024 ? (data.size / 1024).toFixed(1) + ' KB' : (data.size / 1024 / 1024).toFixed(2) + ' MB';
-      show(data.name, size, a);
+      show(ICONS[data.name.split('.').pop().toLowerCase()] || '📄', data.name, size + ' · shared with you', a);
     } else {
       const m = MESSAGES[data.status] || MESSAGES.not_found;
-      show(m[0], m[1]);
+      show(m[0], m[1], m[2]);
     }
   } catch {
-    show('Something went wrong', 'Please try again in a moment.');
+    show('⚠️', 'Something went wrong', 'Please try again in a moment.');
   }
 })();

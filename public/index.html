@@ -7,32 +7,54 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header><h1>FileShare</h1><div id="userbar" hidden><span id="who"></span> <button id="logout" class="ghost">Log out</button></div></header>
+  <header>
+    <h1>📦 File<span>Share</span></h1>
+    <div id="userbar" hidden><span id="who"></span> <button id="logout" class="ghost">Log out</button></div>
+  </header>
   <main>
     <p id="msg" role="status"></p>
 
     <section id="auth" hidden>
-      <h2 id="auth-title">Log in</h2>
-      <form id="auth-form">
-        <label>Email <input type="email" id="email" required autocomplete="username"></label>
-        <label>Password <input type="password" id="password" required minlength="8" autocomplete="current-password"></label>
-        <button type="submit" id="auth-submit">Log in</button>
-      </form>
-      <p><a href="#" id="toggle">Need an account? Register</a></p>
+      <div class="hero">
+        <h2>Send files. <span style="color:var(--accent2)">Not forever.</span></h2>
+        <p>Upload a file, get a private link, and choose when it expires. Revoke it any time.</p>
+        <div class="pills"><span>🔒 Unguessable links</span><span>⏳ Auto-expiry</span><span>🚫 One-click revoke</span><span>📊 Download counts</span></div>
+      </div>
+      <div class="card">
+        <h2 id="auth-title">Log in</h2>
+        <form id="auth-form">
+          <label>Email <input type="email" id="email" required autocomplete="username"></label>
+          <label>Password <input type="password" id="password" required minlength="8" autocomplete="current-password"></label>
+          <button type="submit" id="auth-submit">Log in</button>
+        </form>
+        <p class="hint" style="text-align:center"><a href="#" id="toggle">Need an account? Register</a></p>
+      </div>
     </section>
 
     <section id="dash" hidden>
-      <div class="card">
-        <h2>Upload a file</h2>
-        <form id="upload-form">
-          <input type="file" id="file" required>
-          <button type="submit" id="upload-btn">Upload</button>
-        </form>
-        <progress id="upload-progress" max="1" value="0" hidden></progress>
-        <p class="hint">Max 10 MB per file. Types: pdf, png, jpg, txt, zip, docx.</p>
-        <div class="bar"><div id="bar-fill"></div></div>
-        <p id="quota-text" class="hint"></p>
+      <div class="stats">
+        <div class="stat"><b id="st-files">0</b><small>files</small></div>
+        <div class="stat"><b id="st-links">0</b><small>active links</small></div>
+        <div class="stat"><b id="st-dl">0</b><small>total downloads</small></div>
       </div>
+      <div class="card" style="margin-top:12px">
+        <b>Storage</b> <span id="quota-text" class="hint"></span>
+        <div class="bar"><div id="bar-fill"></div></div>
+      </div>
+
+      <h2>Upload</h2>
+      <form id="upload-form">
+        <div id="dropzone" tabindex="0">
+          <div class="big">☁️</div>
+          <strong>Drop a file here or click to browse</strong>
+          <p>Max 10 MB · pdf, png, jpg, txt, zip, docx</p>
+          <div id="picked"></div>
+        </div>
+        <input type="file" id="file">
+        <button type="submit" id="upload-btn" hidden>Upload</button>
+        <progress id="upload-progress" max="1" value="0" hidden></progress>
+      </form>
+
       <h2>Your files</h2>
       <div id="files"></div>
     </section>
