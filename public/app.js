@@ -73,10 +73,11 @@ function renderFiles(files) {
 
     const row = el('div', undefined, 'row');
     const sel = el('select');
-    for (const [label, secs] of [['Expires in 1 hour', 3600], ['Expires in 1 day', 86400], ['Expires in 7 days', 604800]]) {
+    for (const [label, secs] of [['Expires in 30 seconds', 30], ['Expires in 5 minutes', 300], ['Expires in 1 hour', 3600], ['Expires in 1 day', 86400], ['Expires in 7 days', 604800]]) {
       const o = el('option', label); o.value = secs; sel.append(o);
     }
-    sel.value = 86400;
+    sel.value = 3600;
+    sel.setAttribute('aria-label', 'Link expiry');
     const mk = el('button', 'Create share link', 'primary');
     const link = el('div', undefined, 'newlink');
     mk.onclick = async () => {
@@ -110,8 +111,13 @@ function renderFiles(files) {
           el('span', ({ active: 'expires ', expired: 'expired ', revoked: 'was due ' })[l.status] + fmtDate(l.expires_at), 'hint when'),
           el('span', `${l.download_count} download${l.download_count === 1 ? '' : 's'}`)
         );
-        const slot = el('span');
+        const slot = el('span', undefined, 'btns');
         if (l.status === 'active') {
+          const ex = el('button', 'Expire now', 'ghost small');
+          ex.onclick = async () => {
+            try { await api('POST', `/api/links/${l.id}/expire`); say('Link expired'); refresh(); } catch (e) { say(e.message, true); }
+          };
+          slot.append(ex, ' ');
           const rv = el('button', 'Revoke', 'ghost small');
           rv.onclick = async () => {
             try { await api('POST', `/api/links/${l.id}/revoke`); say('Link revoked'); refresh(); } catch (e) { say(e.message, true); }

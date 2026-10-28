@@ -17,7 +17,7 @@ Users need to send a file to someone else through a link that expires or can be 
 | Max file size | 10 MB | Server, while the upload streams (also a quick client check) |
 | Per-user quota | 50 MB total | Server, inside a database transaction |
 | Allowed types | pdf, png, jpg/jpeg, txt, zip, docx | Server: extension allowlist and a check of the file's real first bytes |
-| Link expiry | 1 hour, 1 day or 7 days | Server, checked on every request |
+| Link expiry | 30 seconds, 5 minutes, 1 hour, 1 day or 7 days; owner can also expire a link early | Server, checked on every request |
 | Upload rate | 20 per minute per IP | Server (`express-rate-limit`) |
 | Login/register rate | 30 per 15 minutes per IP | Server |
 | Password | 8 to 100 characters | Server |
@@ -29,7 +29,7 @@ Users need to send a file to someone else through a link that expires or can be 
 4. **Share link:** the owner picks an expiry and gets a URL once. The raw token is never stored.
 5. **Recipient page:** `/s/<token>` shows file name and size with a Download button, or a specific message for expired, revoked and not-found links.
 6. **Download:** streams the file as an attachment and increments the link's download count.
-7. **Revoke:** the owner turns a link off immediately.
+7. **Revoke or expire now:** the owner turns a link off immediately. A revoked link shows "revoked"; a link expired early shows "expired".
 8. **Delete:** the owner deletes a file. Its record, its links and the file on disk are removed.
 
 ## 5. Architecture
@@ -90,8 +90,9 @@ GET    /api/me                       -> {email, used_bytes, quota_bytes}
 POST   /api/files          (multipart, field "file")
 GET    /api/files                    -> files with links and download counts
 DELETE /api/files/:id
-POST   /api/files/:id/links          {expires_in: 3600|86400|604800} -> {id, url, expires_at}
+POST   /api/files/:id/links          {expires_in: 30|300|3600|86400|604800} -> {id, url, expires_at}
 POST   /api/links/:id/revoke         -> {ok:true}
+POST   /api/links/:id/expire         -> {ok:true}   (ends the link now; recipient sees "expired")
 GET    /api/s/:token                 -> {status:'ok', name, size} | {status:'expired'|'revoked'|'not_found'}
 GET    /s/:token                     (recipient page)
 GET    /s/:token/download            (file as attachment)

@@ -107,3 +107,26 @@ test('deleting a file kills its links', async () => {
   await fetch(base + '/api/files/' + id, { method: 'DELETE', headers: { cookie: c } });
   assert.equal((await fetch(`${base}/api/s/${tokenOf(url)}`)).status, 404);
 });
+
+test('short expiry options are accepted and "expire now" ends a link', async () => {
+  const c = await login('short@test.com');
+  const id = await uploadPng(c);
+  for (const v of [30, 300]) assert.equal((await post(`/api/files/${id}/links`, c, { expires_in: v })).status, 201);
+  const { url, id: linkId } = await (await post(`/api/files/${id}/links`, c, { expires_in: 3600 })).json();
+  assert.equal((await fetch(`${base}/api/s/${tokenOf(url)}`)).status, 200);
+  assert.equal((await post(`/api/links/${linkId}/expire`, c)).status, 200);
+  const r = await fetch(`${base}/api/s/${tokenOf(url)}`);
+  assert.equal(r.status, 410);
+  assert.equal((await r.json()).status, 'expired');
+  const list = await (await fetch(base + '/api/files', { headers: { cookie: c } })).json();
+  assert.equal(list[0].links.find((l) => l.id === linkId).status, 'expired');
+});
+
+test("cannot expire someone else's link", async () => {
+  const owner = await login('own2@test.com');
+  const other = await login('other2@test.com');
+  const id = await uploadPng(owner);
+  const { id: linkId } = await (await post(`/api/files/${id}/links`, owner, { expires_in: 3600 })).json();
+  assert.equal((await post(`/api/links/${linkId}/expire`, other)).status, 404);
+  assert.equal((await fetch(base + `/api/links/${linkId}/expire`, { method: 'POST' })).status, 401);
+});

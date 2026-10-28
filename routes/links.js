@@ -8,13 +8,13 @@ const { requireAuth } = require('../middleware/auth');
 const { newToken, hashToken } = require('../lib/tokens');
 
 const router = express.Router();
-const ALLOWED_EXPIRY = [3600, 86400, 604800]; // 1 hour, 1 day, 7 days
+const ALLOWED_EXPIRY = [30, 300, 3600, 86400, 604800]; // 30 s, 5 min, 1 hour, 1 day, 7 days
 const linkLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false });
 
 router.post('/files/:id/links', requireAuth, linkLimiter, (req, res) => {
   const secs = Number(req.body && req.body.expires_in);
   if (!ALLOWED_EXPIRY.includes(secs)) {
-    return res.status(400).json({ error: 'Expiry must be 1 hour, 1 day or 7 days' });
+    return res.status(400).json({ error: 'Expiry must be 30 seconds, 5 minutes, 1 hour, 1 day or 7 days' });
   }
   // owner_id in the query: someone else's file looks like "not found"
   const file = db.prepare('SELECT id FROM files WHERE id = ? AND owner_id = ?').get(req.params.id, req.user.id);
@@ -37,6 +37,18 @@ router.post('/links/:id/revoke', requireAuth, (req, res) => {
   if (!link.revoked_at) {
     db.prepare('UPDATE links SET revoked_at = ? WHERE id = ?').run(new Date().toISOString(), link.id);
   }
+  res.json({ ok: true });
+});
+
+// Manual expire: ends the link right now by moving its expiry to the present.
+// The recipient then sees "expired" (revoke shows "revoked" instead).
+router.post('/links/:id/expire', requireAuth, (req, res) => {
+  const link = db
+    .prepare('SELECT l.id FROM links l JOIN files f ON f.id = l.file_id WHERE l.id = ? AND f.owner_id = ?')
+    .get(req.params.id, req.user.id);
+  if (!link) return res.status(404).json({ error: 'Link not found' });
+  const now = new Date().toISOString();
+  db.prepare('UPDATE links SET expires_at = ? WHERE id = ? AND expires_at > ?').run(now, link.id, now);
   res.json({ ok: true });
 });
 

@@ -146,6 +146,7 @@ code { font-weight: 700; color: var(--dp-color-accent); }
 .lk { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 8px 12px; font-size: 13px; background: var(--dp-color-panel); }
 .lk .when { flex: 1 1 140px; }
 .lk > :last-child { margin-left: auto; }
+.lk .btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .lk + .lk { border-top: var(--dp-border-detail-width) solid var(--dp-color-rule-muted); }
 .badge { padding: 1px 10px; border: var(--dp-border-detail-width) solid var(--dp-color-outline); border-radius: 999px; font-size: 12px; font-weight: 700; text-align: center; }
 .st-active { background: var(--dp-color-accent-fresh); }
