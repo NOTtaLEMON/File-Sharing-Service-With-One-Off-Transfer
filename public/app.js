@@ -25,8 +25,7 @@ async function api(method, url, body) {
 
 const fmtSize = (b) => (b < 1024 * 1024 ? (b / 1024).toFixed(1) + ' KB' : (b / 1024 / 1024).toFixed(2) + ' MB');
 const fmtDate = (iso) => new Date(iso).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
-const ICONS = { pdf: '📕', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', txt: '📝', zip: '🗜️', docx: '📘' };
-const iconFor = (name) => ICONS[name.split('.').pop().toLowerCase()] || '📄';
+const iconFor = (name) => (name.split('.').pop() || 'file').slice(0, 4).toUpperCase();
 
 function showAuth() {
   $('auth').hidden = false;
@@ -62,13 +61,14 @@ function el(tag, text, cls) {
 function renderFiles(files) {
   const box = $('files');
   box.replaceChildren();
-  if (!files.length) box.append(el('div', 'Nothing here yet. Drop your first file above 👆', 'card empty'));
+  if (!files.length) box.append(el('div', 'Nothing here yet. Drop your first file above.', 'book empty'));
   for (const f of files) {
-    const card = el('div', undefined, 'card');
+    const card = el('div', undefined, 'book');
+    card.append(el('span', iconFor(f.name), 'tab'));
     const head = el('div', undefined, 'file-head');
     const info = el('div');
     info.append(el('strong', f.name), el('div', `${fmtSize(f.size)} · uploaded ${fmtDate(f.created_at + 'Z')}`, 'hint'));
-    head.append(el('div', iconFor(f.name), 'ico'), info);
+    head.append(el('div', iconFor(f.name).slice(0, 3), 'ico'), info);
     card.append(head);
 
     const row = el('div', undefined, 'row');
@@ -77,14 +77,14 @@ function renderFiles(files) {
       const o = el('option', label); o.value = secs; sel.append(o);
     }
     sel.value = 86400;
-    const mk = el('button', '🔗 Create share link');
+    const mk = el('button', 'Create share link', 'primary');
     const link = el('div', undefined, 'newlink');
     mk.onclick = async () => {
       try {
         const r = await api('POST', `/api/files/${f.id}/links`, { expires_in: Number(sel.value) });
         const url = r.url.startsWith('http') ? r.url : location.origin + r.url;
         link.replaceChildren(el('span', 'Copy this now, it is shown only once: '), el('code', url));
-        const copy = el('button', 'Copy', 'ghost');
+        const copy = el('button', 'Copy', 'ghost small');
         copy.onclick = () => navigator.clipboard.writeText(url).then(() => say('Link copied'));
         link.append(' ', copy);
         say('Share link created');
@@ -108,11 +108,11 @@ function renderFiles(files) {
           el('span', '#' + l.id, 'hint'),
           el('span', l.status, 'badge st-' + l.status),
           el('span', (l.status === 'active' ? 'expires ' : 'expired ') + fmtDate(l.expires_at), 'hint'),
-          el('span', `⬇ ${l.download_count}`)
+          el('span', `${l.download_count} downloads`)
         );
         const slot = el('span');
         if (l.status === 'active') {
-          const rv = el('button', 'Revoke', 'ghost');
+          const rv = el('button', 'Revoke', 'ghost small');
           rv.onclick = async () => {
             try { await api('POST', `/api/links/${l.id}/revoke`); say('Link revoked'); refresh(); } catch (e) { say(e.message, true); }
           };
@@ -170,7 +170,7 @@ const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED = ['pdf', 'png', 'jpg', 'jpeg', 'txt', 'zip', 'docx'];
 
 function setPicked(file) {
-  $('picked').textContent = file ? `${iconFor(file.name)} ${file.name} (${fmtSize(file.size)})` : '';
+  $('picked').textContent = file ? `${file.name} (${fmtSize(file.size)})` : '';
   $('upload-btn').hidden = !file;
 }
 

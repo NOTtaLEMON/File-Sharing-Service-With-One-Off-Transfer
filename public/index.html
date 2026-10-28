@@ -4,61 +4,82 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FileShare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@700;800&family=Instrument+Sans:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <header>
-    <h1>📦 File<span>Share</span></h1>
-    <div id="userbar" hidden><span id="who"></span> <button id="logout" class="ghost">Log out</button></div>
+    <div class="brand"><span class="logo" aria-hidden="true"></span>FileShare</div>
+    <div id="userbar" hidden><span id="who"></span> <button id="logout" class="ghost small">Log out</button></div>
   </header>
   <main>
     <p id="msg" role="status"></p>
 
     <section id="auth" hidden>
-      <div class="hero">
-        <h2>Send files. <span style="color:var(--accent2)">Not forever.</span></h2>
-        <p>Upload a file, get a private link, and choose when it expires. Revoke it any time.</p>
-        <div class="pills"><span>🔒 Unguessable links</span><span>⏳ Auto-expiry</span><span>🚫 One-click revoke</span><span>📊 Download counts</span></div>
+      <div class="opening">
+        <div>
+          <span class="kicker">One-off file transfer</span>
+          <h2>Send a file. <em>Not forever.</em></h2>
+          <p class="lead">Upload a file, get a private link, and choose when it expires. Revoke it whenever you like.</p>
+          <div class="facts"><span>Unguessable links</span><span>Auto-expiry</span><span>One-click revoke</span><span>Download counts</span></div>
+        </div>
+        <div class="stage">
+          <span class="shape s-circle" aria-hidden="true"></span>
+          <span class="shape s-arch" aria-hidden="true"></span>
+          <span class="shape s-block" aria-hidden="true"></span>
+          <span class="shape s-tri" aria-hidden="true"></span>
+          <div class="book">
+            <span class="tab">Welcome</span>
+            <h2 id="auth-title">Log in</h2>
+            <form id="auth-form">
+              <label>Email <input type="email" id="email" required autocomplete="username"></label>
+              <label>Password <input type="password" id="password" required minlength="8" autocomplete="current-password"></label>
+              <button type="submit" id="auth-submit">Log in</button>
+            </form>
+            <p class="switch hint"><a href="#" id="toggle">Need an account? Register</a></p>
+          </div>
+        </div>
       </div>
-      <div class="card">
-        <h2 id="auth-title">Log in</h2>
-        <form id="auth-form">
-          <label>Email <input type="email" id="email" required autocomplete="username"></label>
-          <label>Password <input type="password" id="password" required minlength="8" autocomplete="current-password"></label>
-          <button type="submit" id="auth-submit">Log in</button>
-        </form>
-        <p class="hint" style="text-align:center"><a href="#" id="toggle">Need an account? Register</a></p>
-      </div>
+      <ol class="steps" style="list-style:none;padding:0">
+        <li class="step"><b>1</b><strong>Upload</strong><span>Pick a file within the size limit.</span></li>
+        <li class="step"><b>2</b><strong>Share</strong><span>Get a link and pick its expiry.</span></li>
+        <li class="step"><b>3</b><strong>Expire</strong><span>The link stops working on time, or when you revoke it.</span></li>
+      </ol>
     </section>
 
     <section id="dash" hidden>
+      <h2 class="dash-title">Your files</h2>
       <div class="stats">
         <div class="stat"><b id="st-files">0</b><small>files</small></div>
         <div class="stat"><b id="st-links">0</b><small>active links</small></div>
         <div class="stat"><b id="st-dl">0</b><small>total downloads</small></div>
       </div>
-      <div class="card" style="margin-top:12px">
+      <div class="storage">
         <b>Storage</b> <span id="quota-text" class="hint"></span>
         <div class="bar"><div id="bar-fill"></div></div>
       </div>
 
-      <h2>Upload</h2>
-      <form id="upload-form">
-        <div id="dropzone" tabindex="0">
-          <div class="big">☁️</div>
+      <h2 class="section-title">Upload</h2>
+      <form id="upload-form" class="book">
+        <span class="tab">New file</span>
+        <div id="dropzone" tabindex="0" role="button" aria-label="Choose a file to upload">
+          <div class="big" aria-hidden="true">&#8593;</div>
           <strong>Drop a file here or click to browse</strong>
-          <p>Max 10 MB · pdf, png, jpg, txt, zip, docx</p>
+          <p>Max 10 MB &middot; pdf, png, jpg, txt, zip, docx</p>
           <div id="picked"></div>
         </div>
-        <input type="file" id="file">
+        <input type="file" id="file" aria-label="File to upload">
         <button type="submit" id="upload-btn" hidden>Upload</button>
         <progress id="upload-progress" max="1" value="0" hidden></progress>
       </form>
 
-      <h2>Your files</h2>
-      <div id="files"></div>
+      <h2 class="section-title">Shared files</h2>
+      <div id="files" class="files"></div>
     </section>
   </main>
+  <footer><b>FileShare</b><span>One-off file transfer with expiring links</span></footer>
   <script src="/app.js"></script>
 </body>
 </html>
