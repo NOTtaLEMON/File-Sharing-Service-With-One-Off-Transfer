@@ -4,6 +4,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
+process.env.UPLOAD_RATE_LIMIT = '1000'; // tests upload many files quickly
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'fs-test-'));
 const app = require('../server');
 
@@ -66,4 +67,28 @@ test('a valid cookie for a user that no longer exists is rejected, not crashed o
   assert.equal((await fetch(base + '/api/me', { headers: { cookie: c } })).status, 401);
   assert.equal((await upload(c, 'pic.png', PNG)).status, 401);
   assert.equal((await fetch(base + '/api/health')).status, 200); // server still up
+});
+
+test('pptx and many image types are accepted when their bytes match, rejected when they do not', async () => {
+  const c = await login('types@test.com');
+  const z = (extra) => Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.from(extra)]);
+  const ftyp = (brand) => Buffer.concat([Buffer.from([0, 0, 0, 24]), Buffer.from('ftyp' + brand), Buffer.alloc(12)]);
+  const good = {
+    'deck.pptx': z('ppt'),
+    'a.gif': Buffer.from('GIF89a......'),
+    'a.webp': Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBPVP8 ')]),
+    'a.bmp': Buffer.from('BM......'),
+    'a.tiff': Buffer.from([0x49, 0x49, 0x2a, 0x00, 1, 2]),
+    'a.ico': Buffer.from([0, 0, 1, 0, 1, 0]),
+    'a.avif': ftyp('avif'),
+    'a.heic': ftyp('heic'),
+    'a.jpeg': Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2]),
+  };
+  for (const [name, bytes] of Object.entries(good)) assert.equal((await upload(c, name, bytes)).status, 201, name);
+  // wrong bytes for the claimed type
+  for (const name of ['fake.pptx', 'fake.gif', 'fake.webp', 'fake.avif', 'fake.ico']) {
+    assert.equal((await upload(c, name, Buffer.from('MZ not what it says'))).status, 415, name);
+  }
+  // svg is refused outright
+  assert.equal((await upload(c, 'x.svg', Buffer.from('<svg onload="alert(1)"/>'))).status, 415);
 });

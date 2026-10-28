@@ -12,7 +12,7 @@ const { TYPES, extOf, cleanName, sniff } = require('../lib/validate');
 const router = express.Router();
 router.use(requireAuth);
 
-const uploadLimiter = rateLimit({ windowMs: 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
+const uploadLimiter = rateLimit({ windowMs: 60 * 1000, limit: Number(process.env.UPLOAD_RATE_LIMIT) || 20, standardHeaders: true, legacyHeaders: false });
 
 const usedBytes = (userId) =>
   db.prepare('SELECT COALESCE(SUM(size), 0) AS used FROM files WHERE owner_id = ?').get(userId).used;

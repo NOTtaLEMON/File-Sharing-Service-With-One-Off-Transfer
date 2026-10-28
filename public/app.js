@@ -173,7 +173,7 @@ $('logout').onclick = async () => { await api('POST', '/api/auth/logout'); say('
 
 /* ---------- upload ---------- */
 const MAX_BYTES = 10 * 1024 * 1024;
-const ALLOWED = ['pdf', 'png', 'jpg', 'jpeg', 'txt', 'zip', 'docx'];
+const ALLOWED = ['pdf', 'txt', 'zip', 'docx', 'pptx', 'png', 'jpg', 'jpeg', 'jpe', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'avif', 'heic', 'heif'];
 
 function setPicked(file) {
   $('picked').textContent = file ? `${file.name} (${fmtSize(file.size)})` : '';
@@ -218,7 +218,7 @@ $('upload-form').onsubmit = async (e) => {
   if (!file) return;
   // quick checks for a fast error; the server enforces the same rules again
   const ext = file.name.split('.').pop().toLowerCase();
-  if (!ALLOWED.includes(ext)) return say('File type not allowed. Allowed: ' + ALLOWED.join(', '), true);
+  if (!ALLOWED.includes(ext)) return say('File type not allowed. Use a document (pdf, docx, pptx, txt, zip) or an image (png, jpg, gif, webp, bmp, tiff, ico, avif, heic).', true);
   if (file.size > MAX_BYTES) return say('File too large (max 10 MB)', true);
   if (file.size === 0) return say('That file is empty', true);
 

@@ -47,7 +47,7 @@ See [.env.example](.env.example).
 |---|---|
 | Max size | 10 MB per file |
 | Quota | 50 MB per user |
-| Types | pdf, png, jpg/jpeg, txt, zip, docx |
+| Types | pdf, docx, pptx, txt, zip, and images: png, jpg/jpeg, gif, webp, bmp, tif/tiff, ico, avif, heic/heif (SVG excluded on purpose, it can contain scripts) |
 | Link expiry | 30 seconds, 5 minutes, 1 hour, 1 day or 7 days; the owner can also expire a link early with "Expire now" |
 | Rate limits | uploads 20/min, link creation 30/min, public link views 60/min, login/register 30 per 15 min (per IP) |
 

@@ -4,6 +4,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
+process.env.UPLOAD_RATE_LIMIT = '1000'; // tests upload many files quickly
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'fs-links-'));
 const app = require('../server');
 const db = require('../db');

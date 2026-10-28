@@ -14,5 +14,4 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET || 'dev-only-secret-change-me',
   MAX_FILE_BYTES: 10 * 1024 * 1024, // 10 MB per file
   QUOTA_BYTES: 50 * 1024 * 1024, // 50 MB per user
-  ALLOWED_EXT: ['pdf', 'png', 'jpg', 'jpeg', 'txt', 'zip', 'docx'],
 };

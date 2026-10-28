@@ -16,7 +16,7 @@ Users need to send a file to someone else through a link that expires or can be 
 |---|---|---|
 | Max file size | 10 MB | Server, while the upload streams (also a quick client check) |
 | Per-user quota | 50 MB total | Server, inside a database transaction |
-| Allowed types | pdf, png, jpg/jpeg, txt, zip, docx | Server: extension allowlist and a check of the file's real first bytes |
+| Allowed types | pdf, docx, pptx, txt, zip, images (png, jpg, gif, webp, bmp, tiff, ico, avif, heic; not SVG) | Server: extension allowlist and a check of the file's real first bytes |
 | Link expiry | 30 seconds, 5 minutes, 1 hour, 1 day or 7 days; owner can also expire a link early | Server, checked on every request |
 | Upload rate | 20 per minute per IP | Server (`express-rate-limit`) |
 | Login/register rate | 30 per 15 minutes per IP | Server |
